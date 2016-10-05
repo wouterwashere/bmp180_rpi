@@ -172,7 +172,7 @@ long bmp180_get_temperature(long ut)
 /* Calculate pressure at sea level */
 long bmp180_pressure_at_sea_level(long pressure)
 {
-	return pressure_at_sea_level = ((pressure / 100) * powf (1 - ((0.0065 * height) / ((temperature / 10) + (0.0065 * height) + 273.15)), -5.257)) /100;
+	return pressure_at_sea_level = ((pressure / 100) * powf (1 - ((0.0065 * height) / ((temperature / 10) + (0.0065 * height) + 273.15)), -5.257)) * 100;
 }
 
 #endif
