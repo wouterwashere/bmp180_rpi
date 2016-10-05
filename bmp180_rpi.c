@@ -1,4 +1,4 @@
-#include "hih61xx_rpi.h"
+#include "bmp180_rpi.h"
 
 int main(int argc, char **argv)
 {
