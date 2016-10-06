@@ -17,8 +17,9 @@
 const short BMP180_OVERSAMPLING_SETTING = 3;
 short ac1, ac2, ac3, b1, b2, mb, mc, md, height;
 unsigned short ac4, ac5, ac6;
-long ut, up, x1, x2, b5, b6, t, x3, b3, x1, x2, x3, p, temperature, pressure, pressure_at_sea_level;
+long ut, up, x1, x2, b5, b6, t, x3, b3, x1, x2, x3, p;
 unsigned long b4, b7;
+float pressure_at_sea_level, pressure, temperature;
 
 /* Connect to BMP180 */
 int bmp180_open()
@@ -86,6 +87,7 @@ void bmp180_write(int fd, unsigned char address, unsigned char value)
 /* Read uncompensated temperature value */
 long bmp180_get_ut()
 {
+	bmp180_get_cal_param();
 	ut = 0;
 	int fd = bmp180_open();
 
@@ -117,6 +119,7 @@ void bmp180_read_block(int fd, unsigned char address, unsigned char length, unsi
 /* Read uncompensated pressure value */
 long bmp180_get_up()
 {
+	bmp180_get_cal_param();
 	up = 0;
 	int fd = bmp180_open();
 
@@ -136,8 +139,9 @@ long bmp180_get_up()
 }
 
 /* Calculate true pressure */
-long bmp180_calpressure(long up)
+float bmp180_get_pressure()
 {
+	up = bmp180_get_up();
 	b6 = b5 - 4000;
 	x1 = (b2 * (b6 * b6 / 4096 )) / 2048;
 	x2 = ac2 * b6 / 2048;
@@ -155,24 +159,25 @@ long bmp180_calpressure(long up)
 	x1 = (p / 256) * (p / 256);
 	x1 = (x1 * 3038) / 65536;
 	x2 = (-7357 * p) / 65536;
-	long result = (p + (x1 + x2 + 3791) / 16);
+	float result = (p + (float)(x1 + x2 + 3791) / 16) / 100;
 	return result;
 }
 
 /* Calculate true temperature */
-long bmp180_get_temperature(long ut)
+float bmp180_get_temperature()
 {
+	long ut = bmp180_get_ut();
 	x1 = (ut - ac6) * ac5 / 32768;
 	x2 = mc * 2048 / (x1 + md);
 	b5 = x1 + x2;
-	long result = ((b5 + 8) / 16);
+	float result = ((float)(b5 + 8) / 16) / 10;
 	return result;
 }
 
 /* Calculate pressure at sea level */
-long bmp180_pressure_at_sea_level(long pressure)
+float bmp180_pressure_at_sea_level(float pressure)
 {
-	return pressure_at_sea_level = ((float)(pressure / 100) * powf (1 - ((float)(0.0065 * height) / ((float)(temperature / 10) + (float)(0.0065 * height) + 273.15)), -5.257)) * 100;
+	return pressure_at_sea_level = pressure * powf (1 - (0.0065 * height / (temperature + 0.0065 * height + 273.15)), -5.257);
 }
 
 #endif
