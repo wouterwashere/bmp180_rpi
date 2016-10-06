@@ -1,5 +1,5 @@
-#ifndef HIH61XX_RPI_H
-#define HIH61XX_RPI_H
+#ifndef BMP180_RPI_H
+#define BMP180_RPI_H
 
 #include <stdio.h>
 #include <fcntl.h>
@@ -11,7 +11,7 @@
 #include <math.h>
 #include "smbus.h"
 
-#define BMP085_I2C_ADDRESS 0x77
+#define BMP180_I2C_ADDRESS 0x77
 
 /* Declare variables */
 const short BMP180_OVERSAMPLING_SETTING = 3;
@@ -29,7 +29,7 @@ int bmp180_open()
 		exit(1);
 
 	/* Set options and address */
-	if(ioctl(fd, I2C_SLAVE, BMP085_I2C_ADDRESS)<0)
+	if(ioctl(fd, I2C_SLAVE, BMP180_I2C_ADDRESS)<0)
 	{
 		close(fd);
 		exit(1);
@@ -73,7 +73,7 @@ void bmp180_get_cal_param()
 	close(fd);
 }
 
-/* Write a byte to the BMP085 */
+/* Write a byte to the BMP180 */
 void bmp180_write(int fd, unsigned char address, unsigned char value)
 {
 	if (i2c_smbus_write_byte_data(fd, address, value) < 0)
